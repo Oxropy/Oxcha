@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Twitchat.GUI.View.ClientControlListItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Twitchat.GUI.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Grid.Column = "0" Bild vom ChatChannel -->
+        
+        
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label x:Name="ChatType" Grid.Column="0" Content="{Binding ChatType}"/>
+                <Label x:Name="ChannelName" Grid.Column="1" Content="{Binding ChannelName}"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Setter Property="Background" Value="LightBlue"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                <Setter Property="Visibility" Value="Hidden"/>
+                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Label Grid.Row="0" Grid.Column="0" Content="Viewer:" />
+                <Label x:Name="ViewerCount" Grid.Row="0" Grid.Column="1" Content="{Binding ViewerCount}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Chatter:" />
+                <Label x:Name="ChatterCount" Grid.Row="1" Grid.Column="1" Content="{Binding ChatterCount}"/>
+            </Grid>
+
+        </Grid>
+    </Grid>
+</UserControl>
