@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ORM.Dao;
+using ORM.DataBase;
+using ORM.DataContract;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +17,15 @@ namespace Oxcha
     {
         static void Main(string[] args)
         {
+            DB DbObject = new DB(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha/Oxcha.db").ToString());
+
+
+            Dao<IDataContract> dao = new Dao<IDataContract>(DbObject);
+
+            WhereClause where = Q.Where(Q.And(Q.Eq(Q.Col("s", "f"), Q.Val("v")), Q.Or(Q.LtEq(Q.Val(1.0), Q.Val(1)), Q.Neq(Q.Val("-1"), Q.Fn("NOW")))));
+            dao.Delete(where);
+
+
             string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
             if (!Directory.Exists(directory))
             {
@@ -75,10 +87,18 @@ namespace Oxcha
                 client.JoinChannel(channel, channelHandler);
 
                 string line = "";
-                while(line != "exit")
+                while(line != "!exit")
                 {
-                    line = Console.ReadLine();
-                    client.SendMessage(channel, line);
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        if (line[0] != '!')
+                        {
+                            line = Console.ReadLine();
+                            client.SendMessage(channel, line);  
+                        } else {
+                            
+                        }
+                    }
                 }
             }
             else

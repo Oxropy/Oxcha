@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twitchat", "Twitchat\Twitchat.csproj", "{B6EB7C16-0DB5-4067-B4D3-1558033CA675}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxcha", "Oxcha\Oxcha.csproj", "{F9B8B68E-5AE9-4D33-B618-9C0E7848A3E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORM", "ORM\ORM.csproj", "{E6FE1301-526A-451B-8625-D8EE009BD610}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F9B8B68E-5AE9-4D33-B618-9C0E7848A3E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9B8B68E-5AE9-4D33-B618-9C0E7848A3E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9B8B68E-5AE9-4D33-B618-9C0E7848A3E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6FE1301-526A-451B-8625-D8EE009BD610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6FE1301-526A-451B-8625-D8EE009BD610}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6FE1301-526A-451B-8625-D8EE009BD610}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6FE1301-526A-451B-8625-D8EE009BD610}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

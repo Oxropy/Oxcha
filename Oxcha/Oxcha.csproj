@@ -132,6 +132,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ORM\ORM.csproj">
+      <Project>{E6FE1301-526A-451B-8625-D8EE009BD610}</Project>
+      <Name>ORM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Twitchat\Twitchat.csproj">
       <Project>{b6eb7c16-0db5-4067-b4d3-1558033ca675}</Project>
       <Name>Twitchat</Name>

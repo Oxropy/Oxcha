@@ -140,6 +140,7 @@
       <DependentUpon>ViewerListItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logic\DataContract\Friend.cs" />
+    <Compile Include="Logic\DataContract\UserAuthKey.cs" />
     <Compile Include="Logic\DataContract\UserInfo.cs" />
     <Compile Include="Authentication\TwitchAuthentication.cs" />
     <Compile Include="Logic\UserAdmin.cs" />
@@ -222,7 +223,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ORM\ORM.csproj">
+      <Project>{E6FE1301-526A-451B-8625-D8EE009BD610}</Project>
+      <Name>ORM</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.107.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.107.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
