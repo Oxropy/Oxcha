@@ -244,76 +244,101 @@ namespace ORM.DataBase
         }
     }
 
-    public class Q
+    public static class Q
     {
         public static WhereClause Where(ITruthy t)
         {
             return new WhereClause(t);
         }
 
-        public static ITruthy And(ITruthy lhs, ITruthy rhs)
+        public static ITruthy And(this ITruthy lhs, ITruthy rhs)
         {
             return Junc(lhs, JunctionOp.And, rhs);
         }
 
-        public static ITruthy Or(ITruthy lhs, ITruthy rhs)
+        public static ITruthy Or(this ITruthy lhs, ITruthy rhs)
         {
             return Junc(lhs, JunctionOp.Or, rhs);
         }
 
-        public static ITruthy Junc(ITruthy lhs, JunctionOp op, ITruthy rhs)
+        public static ITruthy Junc(this ITruthy lhs, JunctionOp op, ITruthy rhs)
         {
             return new Junction(lhs, op, rhs);
         }
 
-        public static ITruthy Eq(IExpression lhs, IExpression rhs)
+        public static ITruthy Eq(this IExpression lhs, IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.Equal, rhs);
         }
 
-        public static ITruthy Neq(IExpression lhs,IExpression rhs)
+        public static ITruthy Neq(this IExpression lhs,IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.NotEqual, rhs);
         }
 
-        public static ITruthy Gt(IExpression lhs, IExpression rhs)
+        public static ITruthy Gt(this IExpression lhs, IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.GreaterThan, rhs);
         }
 
-        public static ITruthy GtEq(IExpression lhs, IExpression rhs)
+        public static ITruthy GtEq(this IExpression lhs, IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.GreaterThanOrEqual, rhs);
         }
 
-        public static ITruthy Lt(IExpression lhs, IExpression rhs)
+        public static ITruthy Lt(this IExpression lhs, IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.LowerThan, rhs);
         }
 
-        public static ITruthy LtEq(IExpression lhs, IExpression rhs)
+        public static ITruthy LtEq(this IExpression lhs, IExpression rhs)
         {
             return Comp(lhs, SqlComparisonOperator.LowerThanOrEqual, rhs);
         }
 
-        public static ITruthy Comp(IExpression lhs, SqlComparisonOperator co, IExpression rhs)
+        public static ITruthy Comp(this IExpression lhs, SqlComparisonOperator co, IExpression rhs)
         {
             return new ComparisonExpression(lhs, co, rhs);
         }
 
-        public static LiteralExpression Val(object s)
+        public static LiteralExpression Val(this object s)
         {
             return new LiteralExpression(s);
         }
 
-        public static FieldReferenceExpression Col(string table, string field)
+        public static FieldReferenceExpression Col(this string table, string field)
         {
             return new FieldReferenceExpression(table, field);
         }
 
-        public static FunctionCallExpression Fn(string name, params IExpression[] parameters)
+        public static FunctionCallExpression Fn(this string name, params IExpression[] parameters)
         {
             return new FunctionCallExpression(name, parameters);
+        }
+
+        public static ListExpression Lst(params IExpression[] parameters)
+        {
+            return new ListExpression(parameters);
+        }
+
+        public static ITruthy IsNull(this IExpression e)
+        {
+            return new IsNullExpression(e);
+        }
+
+        public static ITruthy In(this IExpression lhs, IExpression rhs)
+        {
+            return new InExpression(lhs, rhs);
+        }
+
+        public static ITruthy Lke(this IExpression lhs, ILikeCompatible rhs)
+        {
+            return new LikeExpression(lhs, rhs);
+        }
+
+        public static PlaceholderExpression Plc()
+        {
+            return new PlaceholderExpression();
         }
     }
     

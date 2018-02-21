@@ -17,13 +17,11 @@ namespace Oxcha
     {
         static void Main(string[] args)
         {
-            DB DbObject = new DB(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha/Oxcha.db").ToString());
+            WhereClause where1 = Q.Where(Q.And(Q.Eq(Q.Col("s", "f"), Q.Val("v")), Q.Or(Q.LtEq(Q.Val(2.0), Q.Val(1)), Q.Neq(Q.Val(-1), Q.Fn("NOW")))));
+            WhereClause where2 = Q.Where("s".Col("f").Eq("v".Val()).And(2.0.Val().LtEq(1.Val()).Or((-1).Val().Neq(Q.Fn("NOW")))));
 
-
-            Dao<IDataContract> dao = new Dao<IDataContract>(DbObject);
-
-            WhereClause where = Q.Where(Q.And(Q.Eq(Q.Col("s", "f"), Q.Val("v")), Q.Or(Q.LtEq(Q.Val(1.0), Q.Val(1)), Q.Neq(Q.Val("-1"), Q.Fn("NOW")))));
-            dao.Delete(where);
+            Console.WriteLine(where1);
+            Console.WriteLine(where2);
 
 
             string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
