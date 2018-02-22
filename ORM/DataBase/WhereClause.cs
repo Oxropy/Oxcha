@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace ORM.DataBase
 {
-    public interface IExpression { }
+    public interface IQueryPart
+    {
+        void BuildQuery(StringBuilder sb);
+    }
+
+    public interface IExpression : IQueryPart { }
 
     public interface ITruthy : IExpression { }
-
-    public interface ILikeCompatible : IExpression { }
 
     public interface ILiteralExpression : IExpression { }
 
@@ -20,7 +23,7 @@ namespace ORM.DataBase
         Or
     }
 
-    public enum SqlComparisonOperator
+    public enum ComparisonOperator
     {
         Equal,
         NotEqual,
@@ -43,13 +46,19 @@ namespace ORM.DataBase
             Rhs = rhs;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("({0}) {1} ({2})", Lhs, Op, Rhs);
+            sb.Append("(");
+            Lhs.BuildQuery(sb);
+            sb.Append(") ");
+            sb.Append(Op);
+            sb.Append(" (");
+            Rhs.BuildQuery(sb);
+            sb.Append(")");
         }
     }
 
-    public class LiteralExpression : ILiteralExpression, ILikeCompatible
+    public class LiteralExpression : ILiteralExpression
     {
         public readonly object Literal;
 
@@ -63,14 +72,18 @@ namespace ORM.DataBase
             return s; // TODO: ???
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
             if (Literal is string)
             {
-                return string.Format(@"'{0}'", Sanitize((string)Literal));
+                sb.Append("'");
+                sb.Append(Sanitize((string)Literal));
+                sb.Append("'");
             }
-
-            return Literal.ToString();
+            else
+            {
+                sb.Append(Literal);
+            }
         }
     }
 
@@ -85,9 +98,11 @@ namespace ORM.DataBase
             FieldName = fieldName;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("{0}.{1}", TableName, FieldName);
+            sb.Append(TableName);
+            sb.Append(".");
+            sb.Append(FieldName);
         }
     }
 
@@ -102,9 +117,12 @@ namespace ORM.DataBase
             Parameters = parameters;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("{0}({1})", FunctionName, string.Join(" , ", Parameters));
+            sb.Append(FunctionName);
+            sb.Append("(");
+            QueryHelper.BuildJoinedExpression(sb, ", ", Parameters);
+            sb.Append(")");
         }
     }
 
@@ -117,14 +135,9 @@ namespace ORM.DataBase
             Expressions = expressions;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            if (Expressions == null)
-            {
-                return string.Empty;
-            }
-
-            return string.Format("({0})", string.Join(" , ", Expressions));
+            QueryHelper.BuildJoinedExpression(sb, ", ", Expressions);
         }
     }
 
@@ -137,17 +150,19 @@ namespace ORM.DataBase
             Expr = expr;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("({0}) IS Null", Expr);
+            sb.Append("(");
+            Expr.BuildQuery(sb);
+            sb.Append(") IS Null");
         }
     }
 
     public class PlaceholderExpression : IExpression
     {
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return "?";
+            sb.Append("?");
         }
     }
 
@@ -162,74 +177,96 @@ namespace ORM.DataBase
             Rhr = rhr;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("({0}) IN ({1})", Lhr, Rhr);
+            Lhr.BuildQuery(sb);
+            sb.Append(" IN ");
+            sb.Append("(");
+            Rhr.BuildQuery(sb);
+            sb.Append(")");
         }
     }
 
     public class LikeExpression : ITruthy
     {
         public readonly IExpression Lhr;
-        public readonly ILikeCompatible Rhs;
+        public readonly IExpression Rhs;
 
-        public LikeExpression(IExpression lhr, ILikeCompatible rhs)
+        public LikeExpression(IExpression lhr, IExpression rhs)
         {
             Lhr = lhr;
             Rhs = rhs;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("({0}) LIKE ({1})", Lhr, Rhs);
+            sb.Append(Lhr);
+            sb.Append(" LIKE ");
+            if (Rhs is LiteralExpression rhs)
+            {
+                if (rhs.Literal is string)
+                {
+                    Rhs.BuildQuery(sb);
+                }
+                else
+                {
+                    sb.Append("'");
+                    Rhs.BuildQuery(sb);
+                    sb.Append("'");
+                }
+            }
+            else
+            {
+                Rhs.BuildQuery(sb);
+            }
         }
     }
 
     public class ComparisonExpression : ITruthy
     {
         public readonly IExpression Lhs;
-        public readonly SqlComparisonOperator Op;
+        public readonly ComparisonOperator Op;
         public readonly IExpression Rhs;
 
-        public ComparisonExpression(IExpression lhs, SqlComparisonOperator op, IExpression rhs)
+        public ComparisonExpression(IExpression lhs, ComparisonOperator op, IExpression rhs)
         {
             Lhs = lhs;
             Op = op;
             Rhs = rhs;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            string op;
-            switch (Op)
-            {
-                case SqlComparisonOperator.Equal:
-                    op = "=";
-                    break;
-                case SqlComparisonOperator.NotEqual:
-                    op = "!=";
-                    break;
-                case SqlComparisonOperator.GreaterThan:
-                    op = ">";
-                    break;
-                case SqlComparisonOperator.GreaterThanOrEqual:
-                    op = ">=";
-                    break;
-                case SqlComparisonOperator.LowerThan:
-                    op = "<";
-                    break;
-                case SqlComparisonOperator.LowerThanOrEqual:
-                    op = "<=";
-                    break;
-                default:
-                    throw new Exception();
-            }
+            Lhs.BuildQuery(sb);
+            sb.Append(" ");
+            sb.Append(GetOperatorValue(Op));
+            sb.Append(" ");
+            Rhs.BuildQuery(sb);
+        }
 
-            return string.Format("{0} {1} {2}", Lhs, op, Rhs);
+        public static string GetOperatorValue(ComparisonOperator op)
+        {
+            switch (op)
+            {
+                case ComparisonOperator.Equal:
+                    return "=";
+                case ComparisonOperator.NotEqual:
+                    return "!=";
+                case ComparisonOperator.GreaterThan:
+                    return ">";
+                case ComparisonOperator.GreaterThanOrEqual:
+                    return ">=";
+                case ComparisonOperator.LowerThan:
+                    return "<";
+                case ComparisonOperator.LowerThanOrEqual:
+                    return "<=";
+                default:
+                    throw new Exception("Operator unknown!");
+            }
         }
     }
-    
-    public class WhereClause
+
+    public class WhereClause : IQueryPart
     {
         public readonly ITruthy Expr;
 
@@ -238,14 +275,22 @@ namespace ORM.DataBase
             Expr = expr;
         }
 
-        public override string ToString()
+        public void BuildQuery(StringBuilder sb)
         {
-            return string.Format("WHERE {0}", Expr);
+            sb.Append("WHERE ");
+            Expr.BuildQuery(sb);
         }
     }
 
-    public static class Q
+    public static class QueryBuilderExtensions
     {
+        public static string BuildQuery(this IQueryPart part)
+        {
+            StringBuilder sb = new StringBuilder();
+            part.BuildQuery(sb);
+            return sb.ToString();
+        }
+
         public static WhereClause Where(ITruthy t)
         {
             return new WhereClause(t);
@@ -268,40 +313,40 @@ namespace ORM.DataBase
 
         public static ITruthy Eq(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.Equal, rhs);
+            return Comp(lhs, ComparisonOperator.Equal, rhs);
         }
 
-        public static ITruthy Neq(this IExpression lhs,IExpression rhs)
+        public static ITruthy Neq(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.NotEqual, rhs);
+            return Comp(lhs, ComparisonOperator.NotEqual, rhs);
         }
 
         public static ITruthy Gt(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.GreaterThan, rhs);
+            return Comp(lhs, ComparisonOperator.GreaterThan, rhs);
         }
 
         public static ITruthy GtEq(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.GreaterThanOrEqual, rhs);
+            return Comp(lhs, ComparisonOperator.GreaterThanOrEqual, rhs);
         }
 
         public static ITruthy Lt(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.LowerThan, rhs);
+            return Comp(lhs, ComparisonOperator.LowerThan, rhs);
         }
 
         public static ITruthy LtEq(this IExpression lhs, IExpression rhs)
         {
-            return Comp(lhs, SqlComparisonOperator.LowerThanOrEqual, rhs);
+            return Comp(lhs, ComparisonOperator.LowerThanOrEqual, rhs);
         }
 
-        public static ITruthy Comp(this IExpression lhs, SqlComparisonOperator co, IExpression rhs)
+        public static ITruthy Comp(this IExpression lhs, ComparisonOperator co, IExpression rhs)
         {
             return new ComparisonExpression(lhs, co, rhs);
         }
 
-        public static LiteralExpression Val(this object s)
+        public static LiteralExpression Val(object s)
         {
             return new LiteralExpression(s);
         }
@@ -311,12 +356,12 @@ namespace ORM.DataBase
             return new FieldReferenceExpression(table, field);
         }
 
-        public static FunctionCallExpression Fn(this string name, params IExpression[] parameters)
+        public static FunctionCallExpression Call(this string name, params IExpression[] parameters)
         {
             return new FunctionCallExpression(name, parameters);
         }
 
-        public static ListExpression Lst(params IExpression[] parameters)
+        public static ListExpression List(params IExpression[] parameters)
         {
             return new ListExpression(parameters);
         }
@@ -331,7 +376,7 @@ namespace ORM.DataBase
             return new InExpression(lhs, rhs);
         }
 
-        public static ITruthy Lke(this IExpression lhs, ILikeCompatible rhs)
+        public static ITruthy Like(this IExpression lhs, IExpression rhs)
         {
             return new LikeExpression(lhs, rhs);
         }
@@ -341,5 +386,24 @@ namespace ORM.DataBase
             return new PlaceholderExpression();
         }
     }
-    
+
+    public static class QueryHelper
+    {
+        public static void BuildJoinedExpression(StringBuilder sb, string seperator, IEnumerable<IExpression> expression)
+        {
+            var e = expression.GetEnumerator();
+            if (e.MoveNext())
+            {
+                var v = e.Current;
+                v.BuildQuery(sb);
+
+                while (e.MoveNext())
+                {
+                    v = e.Current;
+                    sb.Append(seperator);
+                    v.BuildQuery(sb);
+                }
+            }
+        }
+    }
 }

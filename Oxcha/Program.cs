@@ -1,5 +1,6 @@
 ﻿using ORM.Dao;
 using ORM.DataBase;
+using static ORM.DataBase.QueryBuilderExtensions;
 using ORM.DataContract;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,9 @@ namespace Oxcha
     {
         static void Main(string[] args)
         {
-            WhereClause where1 = Q.Where(Q.And(Q.Eq(Q.Col("s", "f"), Q.Val("v")), Q.Or(Q.LtEq(Q.Val(2.0), Q.Val(1)), Q.Neq(Q.Val(-1), Q.Fn("NOW")))));
-            WhereClause where2 = Q.Where("s".Col("f").Eq("v".Val()).And(2.0.Val().LtEq(1.Val()).Or((-1).Val().Neq(Q.Fn("NOW")))));
-
-            Console.WriteLine(where1);
-            Console.WriteLine(where2);
+            WhereClause where2 = Where("s".Col("f").Eq(Val("v")).And(Val(2.0).LtEq(Val(1)).Or(Val(-1).Neq("NOW".Call()))));
+            // WHERE (s.f = 'v') And ((2 <= 1) Or (-1 != NOW()))
+            Console.WriteLine(where2.BuildQuery());
 
 
             string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();

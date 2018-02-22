@@ -39,8 +39,7 @@ namespace Twitchat.Logic
                 return authentWindow.Url;
             });
 
-            var success = authResponse as SuccessfulAuthentication;
-            if (success != null)
+            if (authResponse is SuccessfulAuthentication success)
             {
                 MainAdmin.TwitchUserTokenDict.Add(success.Name, success.Token);
             }
