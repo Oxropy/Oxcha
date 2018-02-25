@@ -2,6 +2,7 @@
 using ORM.Attributes;
 using ORM.DataBase;
 using ORM.DataContract;
+using ORM.QueryBuilder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,8 @@ namespace ORM.Dao
         private static ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private DB db;
-        public DbTableAttribute dbTable { get; set; }
-        public List<DbFieldAttribute> dbFieldList { get; private set; }
+        public DbTableAttribute DbTable { get; set; }
+        public List<DbFieldAttribute> DbFieldList { get; private set; }
 
         public Dao(DB db)
         {
@@ -29,15 +30,15 @@ namespace ORM.Dao
             //dbFieldList = customAttributes.Where(a => a is DbFieldAttribute).Select(a => a as DbFieldAttribute).ToList();
         }
 
-        public bool CreateTable<T>()
+        public bool CreateTable()
         {
             try
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0} ", dbTable.Name);
+                sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0} ", DbTable.Name);
                 sb.Append(" ( ");
                 bool isFirst = true;
-                foreach (var dbField in dbFieldList)
+                foreach (var dbField in DbFieldList)
                 {
                     if (isFirst)
                     {
@@ -66,7 +67,7 @@ namespace ORM.Dao
             try
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("INSERT INTO {0} (", dbTable.Name);
+                sb.AppendFormat("INSERT INTO {0} (", DbTable.Name);
             }
             catch (Exception ex)
             {

@@ -54,7 +54,7 @@ namespace Twitchat.Logic
                 DbObject.Run(string.Format("INSERT INTO user_auth_key (user, access_token) VALUES ('{0}', '{1}')", user, accessToken), c => c.ExecuteNonQuery());
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

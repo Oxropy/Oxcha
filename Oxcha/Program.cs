@@ -1,6 +1,6 @@
 ﻿using ORM.Dao;
 using ORM.DataBase;
-using static ORM.DataBase.QueryBuilderExtensions;
+using static ORM.QueryBuilder.QueryBuilderExtensions;
 using ORM.DataContract;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Twitchat.Authentication;
 using Twitchat.Logic;
 using Twitchat.Twitch;
+using ORM.QueryBuilder;
 
 namespace Oxcha
 {
@@ -18,9 +19,17 @@ namespace Oxcha
     {
         static void Main(string[] args)
         {
-            WhereClause where2 = Where("s".Col("f").Eq(Val("v")).And(Val(2.0).LtEq(Val(1)).Or(Val(-1).Neq("NOW".Call()))));
+            SelectClause select = Select(("c".Col("t")).As("a"), "co".Col(), QueryBuilderExtensions.Col("cl").As("col"), "Now".Call().As("Date"));
+            // SELECT (t.c) AS a, co, (cl) AS col, (Now()) AS Date
+            Console.WriteLine(select.GetQuery());
+
+            FromClause from = From("t".Tbl().LftO("lo".Tbl(), "x".Col("t").Eq("y".Col("lo")).And("y".Col("t").Neq("x".Col("lo")))));
+            // FROM t LEFT OUTER JOIN lo ON ((t.x = lo.y) And (t.y != lo.x))
+            Console.WriteLine(from.GetQuery());
+            
+            WhereClause where = Where("c".Col("t").Eq(Val("v")).And(Val(2.0).LtEq(Val(1)).Or(Val(-1).Neq("NOW".Call()))));
             // WHERE (s.f = 'v') And ((2 <= 1) Or (-1 != NOW()))
-            Console.WriteLine(where2.BuildQuery());
+            Console.WriteLine(where.GetQuery());
 
 
             string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
@@ -29,12 +38,21 @@ namespace Oxcha
                 Directory.CreateDirectory(directory);
             }
 
+            Client client = AuthenticateLogin(args);
+            if (client != null)
+            {
+                EntryHandler(client);
+            }
+        }
+
+        private static Client AuthenticateLogin(string[] args)
+        {
             Console.WriteLine("Login user: ");
             string user = Console.ReadLine();
 
             bool newToken = false;
             IAuthenticationResult authResponse;
-            
+
             Dictionary<string, string> UserAccessToken = MainAdmin.GetAccesTokens();
             if (UserAccessToken.ContainsKey(user))
             {
@@ -43,13 +61,15 @@ namespace Oxcha
                 authResponse = new SuccessfulAuthentication(user, UserAccessToken[user]);
 
                 //TODO: nicht in else, da es auch aufgerufen werden muss wenn das token nicht mehr gültig ist
-            } else {
+            }
+            else
+            {
                 if (args.Length < 2)
                 {
                     Console.WriteLine("Too few arguments!");
                     Console.WriteLine("Usage: {0} <client id> <client secret>", Environment.GetCommandLineArgs()[0]);
                     Environment.Exit(1);
-                    return;
+                    return null;
                 }
 
                 string clientId = args[0];
@@ -63,40 +83,21 @@ namespace Oxcha
                 newToken = true;
             }
 
-            var success = authResponse as SuccessfulAuthentication;
-            if (success != null)
+            if (authResponse is SuccessfulAuthentication success)
             {
                 // When new Token add Token to DB
                 if (newToken)
                 {
                     MainAdmin.AddAccesToken(success.Name, success.Token);
                 }
-                
+
                 Console.WriteLine("Authentication Success");
 
                 CliClientHandler clientHandler = new CliClientHandler();
                 Client client = new Client(success.Name, success.Token, clientHandler);
                 client.Connect();
 
-                Console.WriteLine("Channel to join: ");
-                string channel = Console.ReadLine();
-                CliChannelHandler channelHandler = new CliChannelHandler();
-                client.JoinChannel(channel, channelHandler);
-
-                string line = "";
-                while(line != "!exit")
-                {
-                    if (!string.IsNullOrWhiteSpace(line))
-                    {
-                        if (line[0] != '!')
-                        {
-                            line = Console.ReadLine();
-                            client.SendMessage(channel, line);  
-                        } else {
-                            
-                        }
-                    }
-                }
+                return client;
             }
             else
             {
@@ -105,6 +106,80 @@ namespace Oxcha
 
                 Console.ReadKey();
             }
+            return null;
+        }
+
+        private static void EntryHandler(Client client)
+        {
+            string channel = string.Empty;
+
+            ShowInfo();
+
+            string line = "";
+            while (line != "!exit")
+            {
+                line = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    if (line[0] != '!')
+                    {
+                        if (!string.IsNullOrWhiteSpace(channel))
+                        {
+                            client.SendMessage(channel, line); 
+                        } else
+                        {
+                            ShowInfo();
+                        }
+                    }
+                    else
+                    {
+                        if (line.StartsWith("!join"))
+                        {
+                            if (!string.IsNullOrWhiteSpace(channel))
+                            {
+                                CliChannelHandler channelHandler = new CliChannelHandler();
+                                client.JoinChannel(channel, channelHandler); 
+                            } else
+                            {
+                                Console.WriteLine(string.Format("You are joined to '{0}'!", channel));
+                            }
+                        }
+                        else if (line.StartsWith("!leave"))
+                        {
+                            if (!string.IsNullOrWhiteSpace(channel))
+                            {
+                                client.LeaveChannel(channel);
+                                channel = string.Empty; 
+                            }
+                        }
+                        else if (line.StartsWith("!clear"))
+                        {
+                            Console.Clear();
+                        }
+                        else if (line.StartsWith("!help"))
+                        {
+                            ShowHelp();
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void ShowInfo()
+        {
+            Console.WriteLine("You are not connected to a channel.");
+            Console.WriteLine("Use '!join' to join one.");
+            Console.WriteLine("'!help' for help.");
+        }
+
+        private static void ShowHelp()
+        {
+            Console.WriteLine("Commands:");
+            Console.WriteLine("'!exit' : close the program");
+            Console.WriteLine("'!join' : join channel when no channel is joined");
+            Console.WriteLine("'!leave' : leave channel when connect");
+            Console.WriteLine("'!clear' : clears the screen");
         }
     }
 }

@@ -29,8 +29,10 @@ namespace ORM.DataBase
                 {
                     foreach (var parameter in parameters)
                     {
-                        SQLiteParameter sqlParameter = new SQLiteParameter();
-                        sqlParameter.Value = parameter;
+                        SQLiteParameter sqlParameter = new SQLiteParameter
+                        {
+                            Value = parameter
+                        };
 
                         cmd.Parameters.Add(sqlParameter);
                     }
