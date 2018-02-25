@@ -75,42 +75,42 @@ namespace ORM.QueryBuilder
             return new FromClause(t);
         }
 
-        public static ITableName Tbl(this string name, string alias = "")
+        public static ITableName Table(this string name, string alias = "")
         {
             return new TableName(name, alias);
         }
 
-        public static ITableName Inr(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName InnerJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.Inner, rhs, comp);
         }
 
-        public static ITableName Lft(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName LeftJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.Left, rhs, comp);
         }
 
-        public static ITableName Rht(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName RightJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.Right, rhs, comp);
         }
 
-        public static ITableName Fll(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName FullJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.Full, rhs, comp);
         }
 
-        public static ITableName LftO(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName LeftOuterJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.LeftOuter, rhs, comp);
         }
 
-        public static ITableName RhtO(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName RightOuterJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.RightOuter, rhs, comp);
         }
 
-        public static ITableName FllO(this ITableName lhs, ITableName rhs, ITruthy comp)
+        public static ITableName FullOuterJoin(this ITableName lhs, ITableName rhs, ITruthy comp)
         {
             return new JoinCondition(lhs, JoinClause.FullOuter, rhs, comp);
         }

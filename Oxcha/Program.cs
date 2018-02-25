@@ -23,7 +23,7 @@ namespace Oxcha
             // SELECT (t.c) AS a, co, (cl) AS col, (Now()) AS Date
             Console.WriteLine(select.GetQuery());
 
-            FromClause from = From("t".Tbl().LftO("lo".Tbl(), "x".Col("t").Eq("y".Col("lo")).And("y".Col("t").Neq("x".Col("lo")))));
+            FromClause from = From("t".Table().LeftOuterJoin("lo".Table(), "x".Col("t").Eq("y".Col("lo")).And("y".Col("t").Neq("x".Col("lo")))));
             // FROM t LEFT OUTER JOIN lo ON ((t.x = lo.y) And (t.y != lo.x))
             Console.WriteLine(from.GetQuery());
             
