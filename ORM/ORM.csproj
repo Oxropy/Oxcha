@@ -67,6 +67,7 @@
     <Compile Include="DataContract\IDataContract.cs" />
     <Compile Include="DataBase\DB.cs" />
     <Compile Include="QueryBuilder\FromClause.cs" />
+    <Compile Include="QueryBuilder\OrderByClause.cs" />
     <Compile Include="QueryBuilder\QueryBuilder.cs" />
     <Compile Include="QueryBuilder\QueryInterfaces.cs" />
     <Compile Include="QueryBuilder\SelectClause.cs" />

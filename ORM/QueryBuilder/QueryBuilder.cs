@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ORM.QueryBuilder
 {
-    public class FieldReferenceExpression : IExpression, ISelection
+    public class FieldReferenceExpression : IExpression, ISelection, IOrderBy
     {
         public readonly string TableName;
         public readonly string FieldName;
@@ -57,6 +57,16 @@ namespace ORM.QueryBuilder
             return sb.ToString();
         }
 
+        public static FunctionCallExpression Call(this string name, params IExpression[] parameters)
+        {
+            return new FunctionCallExpression(name, parameters);
+        }
+
+        public static FieldReferenceExpression Col(this string field, string table = "")
+        {
+            return new FieldReferenceExpression(field, table);
+        }
+
         #region Select
         public static SelectClause Select(params ISelection[] s)
         {
@@ -75,7 +85,7 @@ namespace ORM.QueryBuilder
             return new FromClause(t);
         }
 
-        public static ITableName Table(this string name, string alias = "")
+        public static ITableName Table(string name, string alias = "")
         {
             return new TableName(name, alias);
         }
@@ -182,16 +192,6 @@ namespace ORM.QueryBuilder
             return new LiteralExpression(s);
         }
 
-        public static FieldReferenceExpression Col(this string field, string table = "")
-        {
-            return new FieldReferenceExpression(field, table);
-        }
-
-        public static FunctionCallExpression Call(this string name, params IExpression[] parameters)
-        {
-            return new FunctionCallExpression(name, parameters);
-        }
-
         public static ListExpression List(params IExpression[] parameters)
         {
             return new ListExpression(parameters);
@@ -215,6 +215,13 @@ namespace ORM.QueryBuilder
         public static PlaceholderExpression Plc()
         {
             return new PlaceholderExpression();
+        }
+        #endregion
+
+        #region Order By
+        public static OrderByClause OrderBy(params IOrderBy[] orderBy)
+        {
+            return new OrderByClause(orderBy);
         }
         #endregion
     }

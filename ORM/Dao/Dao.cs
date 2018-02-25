@@ -24,10 +24,19 @@ namespace ORM.Dao
         {
             this.db = db;
 
-            //Type type = typeof(T);
-            //var customAttributes = type.GetCustomAttributes(false);
-            //dbTable = customAttributes.First(a => a is DbTableAttribute) as DbTableAttribute;
-            //dbFieldList = customAttributes.Where(a => a is DbFieldAttribute).Select(a => a as DbFieldAttribute).ToList();
+            Type type = typeof(T);
+            var customAttributes = type.GetCustomAttributes(false);
+            DbTable = customAttributes.First(a => a is DbTableAttribute) as DbTableAttribute;
+
+            var prop = type.GetProperties();
+            foreach (var item in prop)
+            {
+                 var dbField = item.GetCustomAttribute<DbFieldAttribute>();
+                if (dbField != null)
+                {
+                    DbFieldList.Add(dbField);
+                }
+            }
         }
 
         public bool CreateTable()
@@ -52,7 +61,7 @@ namespace ORM.Dao
                 }
                 sb.Append(")");
 
-                db.Run(sb.ToString(), c => c.ExecuteNonQuery());
+                //db.Run(sb.ToString(), c => c.ExecuteNonQuery());
                 return true;
             }
             catch (Exception ex)

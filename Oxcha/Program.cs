@@ -12,6 +12,7 @@ using Twitchat.Authentication;
 using Twitchat.Logic;
 using Twitchat.Twitch;
 using ORM.QueryBuilder;
+using Twitchat.Logic.DataContract;
 
 namespace Oxcha
 {
@@ -23,7 +24,7 @@ namespace Oxcha
             // SELECT (t.c) AS a, co, (cl) AS col, (Now()) AS Date
             Console.WriteLine(select.GetQuery());
 
-            FromClause from = From("t".Table().LeftOuterJoin("lo".Table(), "x".Col("t").Eq("y".Col("lo")).And("y".Col("t").Neq("x".Col("lo")))));
+            FromClause from = From(Table("t").LeftOuterJoin(Table("lo"), "x".Col("t").Eq("y".Col("lo")).And("y".Col("t").Neq("x".Col("lo")))));
             // FROM t LEFT OUTER JOIN lo ON ((t.x = lo.y) And (t.y != lo.x))
             Console.WriteLine(from.GetQuery());
             
@@ -31,8 +32,16 @@ namespace Oxcha
             // WHERE (s.f = 'v') And ((2 <= 1) Or (-1 != NOW()))
             Console.WriteLine(where.GetQuery());
 
+            OrderByClause orderBy = OrderBy("c".Col("t"), "co".Col());
+            // ORDER BY t.c, co
+            Console.WriteLine(orderBy.GetQuery());
 
-            string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
+            DB DbObject = new DB(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha/Oxcha.db").ToString());
+            Dao<UserAuthKey> firendTable = new Dao<UserAuthKey>(DbObject);
+
+            //firendTable.CreateTable();
+
+        string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
