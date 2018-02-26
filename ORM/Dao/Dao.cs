@@ -17,8 +17,8 @@ namespace ORM.Dao
         private static ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private DB db;
-        public DbTableAttribute DbTable { get; set; }
-        public List<DbFieldAttribute> DbFieldList { get; private set; }
+        public readonly DbTableAttribute DbTable;
+        public readonly List<DbFieldAttribute> DbFieldList = new List<DbFieldAttribute>();
 
         public Dao(DB db)
         {
@@ -46,19 +46,20 @@ namespace ORM.Dao
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0} ", DbTable.Name);
                 sb.Append(" ( ");
-                bool isFirst = true;
-                foreach (var dbField in DbFieldList)
+
+                var e = DbFieldList.GetEnumerator();
+                if (e.MoveNext())
                 {
-                    if (isFirst)
+                    var c = e.Current;
+                    sb.AppendFormat(" {0} {1} ", c.Name, c.Type);
+
+                    while (e.MoveNext())
                     {
-                        isFirst = false;
+                        c = e.Current;
+                        sb.AppendFormat(", {0} {1} ", c.Name, c.Type);
                     }
-                    else
-                    {
-                        sb.Append(",");
-                    }
-                    sb.AppendFormat(" {0} {1} ", dbField.Name, dbField.Type);
                 }
+
                 sb.Append(")");
 
                 //db.Run(sb.ToString(), c => c.ExecuteNonQuery());

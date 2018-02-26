@@ -37,11 +37,11 @@ namespace Oxcha
             Console.WriteLine(orderBy.GetQuery());
 
             DB DbObject = new DB(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha/Oxcha.db").ToString());
-            Dao<UserAuthKey> firendTable = new Dao<UserAuthKey>(DbObject);
+            Dao<UserAuthKey> firenduserAuthTable = new Dao<UserAuthKey>(DbObject);
 
-            //firendTable.CreateTable();
+            firenduserAuthTable.CreateTable();
 
-        string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
+            string directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha").ToString();
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
