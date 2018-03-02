@@ -20,4 +20,6 @@ namespace ORM.QueryBuilder
     public interface ILiteralExpression : IExpression { }
 
     public interface IOrderBy : IQueryPart { }
+
+    public interface ICreate : IExpression { }
 }
