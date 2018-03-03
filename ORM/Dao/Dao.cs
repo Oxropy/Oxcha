@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static ORM.QueryBuilder.QueryBuilderExtensions;
 
 namespace ORM.Dao
 {
@@ -43,24 +44,13 @@ namespace ORM.Dao
         {
             try
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0} ", DbTable.Name);
-                sb.Append(" ( ");
+                IEnumerable<ICreate> createFields = DbFieldList.Select(f =>  f.Name.ColDefinition(f.Type));
+                
+                CreateClause create = Create(DbTable.Name, true, createFields);
 
-                var e = DbFieldList.GetEnumerator();
-                if (e.MoveNext())
-                {
-                    var c = e.Current;
-                    sb.AppendFormat(" {0} {1} ", c.Name, c.Type);
+                string sdf = create.GetQuery();
 
-                    while (e.MoveNext())
-                    {
-                        c = e.Current;
-                        sb.AppendFormat(", {0} {1} ", c.Name, c.Type);
-                    }
-                }
-
-                sb.Append(")");
+                log.Debug(create.GetQuery());
 
                 //db.Run(sb.ToString(), c => c.ExecuteNonQuery());
                 return true;

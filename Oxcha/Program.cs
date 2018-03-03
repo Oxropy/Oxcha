@@ -36,6 +36,10 @@ namespace Oxcha
             // ORDER BY t.c, co
             Console.WriteLine(orderBy.GetQuery());
 
+            CreateClause create = Create("Table", true, "FieldA".ColDefinition(BaseType.Integer, 2), "FieldB".ColDefinition(BaseType.Text, 10));
+            // CREATE TABLE IF NOT EXISTS Table (FieldA Integer, FieldB Text)
+            Console.WriteLine(create.GetQuery());
+
             DB DbObject = new DB(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Oxcha/Oxcha.db").ToString());
             Dao<UserAuthKey> firenduserAuthTable = new Dao<UserAuthKey>(DbObject);
 

@@ -9,6 +9,6 @@ namespace ORM.Attributes
     [AttributeUsage(AttributeTargets.Class)]
     public class DbTableAttribute :Attribute
     {
-        public string Name { get; set; }
+        public string Name;
     }
 }

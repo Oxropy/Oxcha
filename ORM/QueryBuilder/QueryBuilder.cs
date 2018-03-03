@@ -67,6 +67,23 @@ namespace ORM.QueryBuilder
             return new FieldReferenceExpression(field, table);
         }
 
+        #region Create
+        public static CreateClause Create(string name, bool ifNotExist, params ICreate[] create)
+        {
+            return new CreateClause(name, ifNotExist, create);
+        }
+
+        public static CreateClause Create(string name, bool ifNotExist, IEnumerable<ICreate> create)
+        {
+            return new CreateClause(name, ifNotExist, create);
+        }
+
+        public static ColumnDefinition ColDefinition(this string name, BaseType type, int typeLenth = 0)
+        {
+            return new ColumnDefinition(name, type, typeLenth);
+        }
+        #endregion
+
         #region Select
         public static SelectClause Select(params ISelection[] s)
         {

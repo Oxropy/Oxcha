@@ -6,37 +6,11 @@ using System.Threading.Tasks;
 
 namespace ORM.QueryBuilder
 {
-    //https://docs.microsoft.com/en-us/sql/t-sql/statements/create-type-transact-sql#arguments
     public enum BaseType
     {
-        Bigint,
-        Binary,
-        Bit,
-        Char,
-        Date,
-        DateTime,
-        DateTime2,
-        DateTimeOffset,
-        Decimal,
-        Float,
-        Image,
-        Int,
-        Money,
-        NChar,
-        NText,
-        Numeric,
-        NVarchar,
-        Real,
-        SmallDateTime,
-        SmallInt,
-        SmallMoney,
-        Sql_Variant,
         Text,
-        Time,
-        Tinyint,
-        Uniqueidentifier,
-        Varbinary,
-        Varchar
+        Numberic,
+        Integer
     }
     
     public class ColumnDefinition : ICreate
@@ -61,36 +35,34 @@ namespace ORM.QueryBuilder
 
         public static string GetTypeValue(BaseType type, int length)
         {
-            switch (type)
-            {
-                case BaseType.Binary:
-                case BaseType.Char:
-                case BaseType.NChar:
-                case BaseType.NVarchar:
-                case BaseType.Varbinary:
-                case BaseType.Varchar:
-                    return string.Format("{0}({1})", type, length);
-                default:
-                    return type.ToString();
-            }
+            return type.ToString();
         }
     }
 
     public class CreateClause : IQueryPart
     {
         public readonly string Name;
-        public readonly ICreate create;
+        public readonly bool IfNotExist;
+        public readonly IEnumerable<ICreate> Create;
 
-        public CreateClause(string name, ICreate create)
+        public CreateClause(string name, bool ifnotExist, IEnumerable<ICreate> create)
         {
             this.Name = name;
-            this.create = create;
+            this.IfNotExist = ifnotExist;
+            this.Create = create;
         }
 
         public void BuildQuery(StringBuilder sb)
         {
             sb.Append("CREATE TABLE ");
+            if (IfNotExist)
+            {
+                sb.Append("IF NOT EXISTS ");
+            }
             sb.Append(Name);
+            sb.Append(" (");
+            QueryHelper.BuildJoinedExpression(sb, ", ", Create);
+            sb.Append(")");
         }
     }
 }

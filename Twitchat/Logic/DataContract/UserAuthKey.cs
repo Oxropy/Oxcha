@@ -1,5 +1,6 @@
 ﻿using ORM.Attributes;
 using ORM.DataContract;
+using ORM.QueryBuilder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace Twitchat.Logic.DataContract
     [DbTable(Name = "user_auth_key")]
     public class UserAuthKey : IDataContract
     {
-        [DbField(Name = "user", Type = "string")]
+        [DbField(Name = "user", Type = BaseType.Text)]
         public string User { get; set; }
-        [DbField(Name = "access_token", Type = "string")]
+        [DbField(Name = "access_token", Type = BaseType.Text)]
         public string Token { get; set; }
     }
 }
