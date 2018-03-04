@@ -67,7 +67,10 @@
     <Compile Include="DataContract\IDataContract.cs" />
     <Compile Include="DataBase\DB.cs" />
     <Compile Include="QueryBuilder\CreateClause.cs" />
+    <Compile Include="QueryBuilder\DeleteClause.cs" />
+    <Compile Include="QueryBuilder\DropClause.cs" />
     <Compile Include="QueryBuilder\FromClause.cs" />
+    <Compile Include="QueryBuilder\InsertClause.cs" />
     <Compile Include="QueryBuilder\OrderByClause.cs" />
     <Compile Include="QueryBuilder\QueryBuilder.cs" />
     <Compile Include="QueryBuilder\QueryInterfaces.cs" />

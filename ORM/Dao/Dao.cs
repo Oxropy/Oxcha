@@ -48,11 +48,50 @@ namespace ORM.Dao
                 
                 CreateClause create = Create(DbTable.Name, true, createFields);
 
-                string sdf = create.GetQuery();
+                string query = create.GetQuery();
+                log.Debug(query);
 
-                log.Debug(create.GetQuery());
+                //db.Run(query, c => c.ExecuteNonQuery());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("Error: {0}", ex);
+                throw;
+            }
+        }
 
-                //db.Run(sb.ToString(), c => c.ExecuteNonQuery());
+        public bool DropTable()
+        {
+            try
+            {
+                DropClause drop = Drop(DbTable.Name);
+
+                string query = drop.GetQuery();
+                log.Debug(drop.GetQuery());
+
+                //db.Run(query, c => c.ExecuteNonQuery());
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("Error: {0}", ex);
+                throw;
+            }
+        }
+
+        public bool DeleteRow(WhereClause where)
+        {
+            try
+            {
+                DeleteClause delete = Delete(DbTable.Name, where);
+
+                string query = delete.GetQuery();
+                log.Debug(delete.GetQuery());
+
+                //db.Run(query, c => c.ExecuteNonQuery());
+
                 return true;
             }
             catch (Exception ex)
@@ -68,24 +107,6 @@ namespace ORM.Dao
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("INSERT INTO {0} (", DbTable.Name);
-            }
-            catch (Exception ex)
-            {
-                log.ErrorFormat("Error: {0}", ex);
-                throw;
-            }
-            return false;
-        }
-
-        public bool Delete(WhereClause where)
-        {
-            try
-            {
-                StringBuilder sb = new StringBuilder();
-                //sb.AppendFormat("DELETE FROM {0} ", dbTable.Name);
-                sb.Append(where);
-
-                Console.WriteLine(sb.ToString());
             }
             catch (Exception ex)
             {

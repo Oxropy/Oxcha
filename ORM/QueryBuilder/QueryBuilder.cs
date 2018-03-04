@@ -84,6 +84,32 @@ namespace ORM.QueryBuilder
         }
         #endregion
 
+        #region Drop
+        public static DropClause Drop(string name)
+        {
+            return new DropClause(name);
+        }
+        #endregion
+
+        #region Delete
+        public static DeleteClause Delete(string name, WhereClause where)
+        {
+            return new DeleteClause(name, where);
+        }
+        #endregion
+
+        #region Insert
+        public static InsertClause Insert(string name, params InsertValue[] values)
+        {
+            return new InsertClause(name, values);
+        }
+
+        public static InsertValue Value(this string name, object value)
+        {
+            return new InsertValue(name, value);
+        }
+        #endregion
+
         #region Select
         public static SelectClause Select(params ISelection[] s)
         {

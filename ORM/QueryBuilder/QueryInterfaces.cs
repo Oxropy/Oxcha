@@ -22,4 +22,6 @@ namespace ORM.QueryBuilder
     public interface IOrderBy : IQueryPart { }
 
     public interface ICreate : IExpression { }
+
+    public interface IInsert : IExpression { }
 }
